@@ -36,11 +36,6 @@ $spec = @{
             required = $false
             default = $true
         }
-        use_win_10_if_win_11_not_available = @{
-            type = 'bool'
-            required = $false
-            default = $false
-        }
         expand_cabs = @{
             type = 'bool'
             required = $false
