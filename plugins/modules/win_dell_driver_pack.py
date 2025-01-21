@@ -138,4 +138,13 @@ driver_pack_path:
     - success
   description:
     - The path to which the driver pack was downloaded.
+driver_format:
+  type: str
+  returned:
+    - success
+  choices:
+    - exe
+    - cab
+  description:
+    - The format of the driver pack.
 """

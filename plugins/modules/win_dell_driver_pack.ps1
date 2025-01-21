@@ -36,11 +36,6 @@ $spec = @{
             required = $false
             default = $true
         }
-        expand_cabs = @{
-            type = 'bool'
-            required = $false
-            default = $false
-        }
         disambiguation_method = @{
             type = 'str'
             required = $false
@@ -72,7 +67,6 @@ $downloadPath = $module.Params['download_path']
 $catalogUrl = $module.Params['catalog_url']
 $os = $module.Params['os']
 $createVersionSubdirectory = $module.Params['create_version_subdirectory']
-$expandCabs = $module.Params['expand_cabs']
 $disambiguationMethod = $module.Params['disambiguation_method']
 
 $catalogTempPath = $catalogTempPath.TrimEnd("\")
@@ -275,7 +269,8 @@ if ($driverPackFormat -eq 'exe')
 $changed = $false
 $module.Result["catalog_version"] = $catalogVersion
 $module.Result["driver_pack_version"] = $driverPackVersion
-$module.Result["driver_pack_path"] = $downloadFinalPath
+$module.Result["driver_pack_path"] = $downloadFilePath
+$module.Result["driver_format"] = $driverPackFormat
 
 if (-not (Test-Path $downloadFilePath))
 {
@@ -299,30 +294,6 @@ if (-not $changed)
 }
 
 $webClient.DownloadFile($driverPackURL, $downloadFilePath)
-
-if ($driverPackFormat -eq 'cab' -and $expandCabs)
-{
-    try
-    {
-        Start-Process "C:\Windows\System32\expand.exe" -ArgumentList @("""$($downloadFilePath)""", "-F:*", """$($downloadFinalPath)""") -Wait
-    }
-    catch
-    {
-        $module.FailJson("Failed to extract driver pack CAB file '$downloadFilePath'. Error: $_")
-    }
-}
-
-if ($driverPackFormat -eq 'exe')
-{
-    try
-    {
-        Expand-Archive -Path "$($downloadFilePath)" -DestinationPath $downloadFinalPath -Force | Out-Null
-    }
-    catch
-    {
-        $module.FailJson("Failed to extract driver pack EXE file '$($downloadFilePath)'. Error: $_")
-    }
-}
 
 $module.Result["changed"] = $true
 
