@@ -1,0 +1,46 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Download WinPE 10 Driver Pack
+      trippsc2.dell.win_dell_driver_pack:
+        catalog_temp_path: C:\temp
+        download_path: C:\temp\winpe10
+        os: winpe_10
+        create_version_subdirectory: true
+        expand_cabs: false
+
+    - name: Download WinPE 11 Driver Pack
+      trippsc2.dell.win_dell_driver_pack:
+        catalog_temp_path: C:\temp
+        download_path: C:\temp\winpe11
+        os: winpe_11
+        create_version_subdirectory: true
+        expand_cabs: false
+
+    - name: Download Win 10 Driver Packs
+      loop:
+        - OptiPlex 7020 Micro
+        - Latitude 5550
+        - XPS 13 9380
+      trippsc2.dell.win_dell_driver_pack:
+        catalog_temp_path: C:\temp
+        download_path: "C:\\temp\\win10\\{{ item }}"
+        os: win_10
+        model: "{{ item }}"
+        create_version_subdirectory: true
+        expand_cabs: false
+
+    - name: Download Win 11 Driver Packs
+      loop:
+        - OptiPlex 7020 Micro
+        - Latitude 5550
+        - XPS 13 9380
+      trippsc2.dell.win_dell_driver_pack:
+        catalog_temp_path: C:\temp
+        download_path: "C:\\temp\\win11\\{{ item }}"
+        os: win_11
+        model: "{{ item }}"
+        create_version_subdirectory: true
+        expand_cabs: false

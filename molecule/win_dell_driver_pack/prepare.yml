@@ -1,0 +1,21 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Create download directories
+      loop:
+        - C:\temp
+        - C:\temp\winpe10
+        - C:\temp\winpe11
+        - C:\temp\win10
+        - C:\temp\win11
+        - C:\temp\win10\OptiPlex 7020 Micro
+        - C:\temp\win10\Latitude 5550
+        - C:\temp\win10\XPS 13 9380
+        - C:\temp\win11\OptiPlex 7020 Micro
+        - C:\temp\win11\Latitude 5550
+        - C:\temp\win11\XPS 13 9380
+      ansible.windows.win_file:
+        path: "{{ item }}"
+        state: directory
