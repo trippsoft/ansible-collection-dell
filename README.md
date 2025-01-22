@@ -1,4 +1,5 @@
 # Ansible Collection: trippsc2.dell
+
 This collection contains modules and roles for configuring and maintaining Dell hardware.
 
 ## Content
