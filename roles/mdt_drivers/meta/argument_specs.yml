@@ -1,0 +1,131 @@
+---
+argument_specs:
+  main:
+    short_description: Manage Dell MDT Drivers
+    description:
+      - This role manages Dell MDT drivers.
+    author:
+      - Jim Tarpley
+    options:
+      dell_mdt_catalog_download_url:
+        type: str
+        required: false
+        default: https://downloads.dell.com/catalog/DriverPackCatalog.cab
+        description:
+          - The URL from which to download the Dell MDT driver catalog CAB file.
+      dell_mdt_temp_directory_path:
+        type: path
+        required: false
+        description:
+          - The path to the temporary directory in which to store the Dell MDT driver catalog files.
+          - If not provided, the *ansible.windows.win_tempfile* module is used to create a temporary directory.
+      dell_mdt_installation_path:
+        type: path
+        required: false
+        description:
+          - The path to the MDT installation directory.
+          - If not provided, the default installation path is used.
+      dell_mdt_share_path:
+        type: path
+        required: true
+        description:
+          - The path to the MDT deployment share.
+      dell_mdt_winpe_driver_packs:
+        type: list
+        required: true
+        elements: dict
+        description:
+          - The list of Dell WinPE driver packs to download and manage.
+        options:
+          os:
+            type: str
+            required: true
+            choices:
+              - winpe_11
+              - winpe_10
+            description:
+              - The version of WinPE for which to download a driver pack.
+          mdt_path:
+            type: str
+            required: true
+            description:
+              - The path of the driver directory to which to import the driver pack.
+              - This path is relative to the `Out-of-Box Drivers` directory.
+      dell_mdt_operating_systems:
+        type: list
+        required: true
+        elements: dict
+        description:
+          - The list of Dell operating systems for which we will maintain drivers.
+        options:
+          os:
+            type: str
+            required: true
+            choices:
+              - win_11
+              - win_10
+            description:
+              - The version of Windows for which to maintain drivers.
+          base_mdt_path:
+            type: str
+            required: true
+            description:
+              - The base path of the driver directory to which to import driver packs.
+              - This path is relative to the `Out-of-Box Drivers` directory.
+      dell_mdt_models:
+        type: list
+        required: true
+        elements: dict
+        description:
+          - The list of Dell models for which we will maintain drivers.
+        options:
+          catalog_name:
+            type: str
+            required: true
+            description:
+              - The name of the model in the Dell driver catalog.
+          mdt_name:
+            type: str
+            required: true
+            description:
+              - The name of the model in the MDT driver directory.
+              - If you are using WMI filters to select driver, this must accurately match the model name in WMI.
+      dell_mdt_max_retries:
+        type: int
+        required: false
+        default: 3
+        description:
+          - The maximum number of times to retry a download.
+      dell_mdt_update_mdt_boot_image:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to update the MDT boot image.
+          - This will only occur when new WinPE drivers are added.
+      dell_mdt_replace_wds_boot_image:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to replace the WDS boot image.
+          - If *dell_mdt_update_mdt_boot_image* is set to `false`, this will be ignored.
+          - This will only occur when new WinPE drivers are added and a new MDT boot image is created.
+      dell_mdt_wds_boot_image_name:
+        type: str
+        required: false
+        description:
+          - The name of the WDS boot image.
+          - This is required if *dell_mdt_replace_wds_boot_image* is set to `true`.
+      dell_mdt_wds_boot_image_description:
+        type: str
+        required: false
+        description:
+          - The description of the WDS boot image.
+          - If not provided, no description will be provided to the module.
+      dell_mdt_wds_boot_image_display_order:
+        type: int
+        required: false
+        description:
+          - The display order of the WDS boot image.
+          - If not provided, no display order will be provided to the module.

@@ -1,0 +1,6 @@
+---
+- name: Manage drivers by OS
+  loop: "{{ dell_mdt_operating_systems }}"
+  ansible.builtin.include_tasks: win/os.yml
+  loop_control:
+    loop_var: _dell_mdt_operating_system

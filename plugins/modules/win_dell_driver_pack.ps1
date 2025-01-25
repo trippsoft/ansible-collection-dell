@@ -4,18 +4,13 @@
 
 $spec = @{
     options = @{
-        catalog_temp_path = @{
-            type = 'path'
+        catalog_path = @{
+            type = 'str'
             required = $true
         }
         download_path = @{
             type = 'path'
             required = $true
-        }
-        catalog_url = @{
-            type = 'str'
-            required = $false
-            default = 'http://downloads.dell.com/catalog/DriverPackCatalog.cab'
         }
         os = @{
             type = 'str'
@@ -62,24 +57,17 @@ $osToDellOsCode = @{
   
 $module = [Ansible.Basic.AnsibleModule]::Create($args, $spec)
 
-$catalogTempPath = $module.Params['catalog_temp_path']
+$catalogPath = $module.Params['catalog_path']
 $downloadPath = $module.Params['download_path']
-$catalogUrl = $module.Params['catalog_url']
 $os = $module.Params['os']
 $createVersionSubdirectory = $module.Params['create_version_subdirectory']
 $disambiguationMethod = $module.Params['disambiguation_method']
 
-$catalogTempPath = $catalogTempPath.TrimEnd("\")
 $downloadPath = $downloadPath.TrimEnd("\")
 
-if ([System.Uri]::IsWellFormedUriString($catalogUrl, [System.UriKind]::Absolute) -eq $false)
+if (-not (Test-Path $catalogPath -PathType Leaf))
 {
-    $module.FailJson("Catalog URL '$catalogUrl' is not a valid URL.")
-}
-
-if (-not (Test-Path $catalogTempPath))
-{
-    $module.FailJson("Catalog temp directory '$catalogTempPath' does not exist or cannot be accessed.")
+    $module.FailJson("Catalog XML file '$catalogPath' does not exist or cannot be accessed.")
 }
 
 if (-not (Test-Path $downloadPath))
@@ -87,58 +75,11 @@ if (-not (Test-Path $downloadPath))
     $module.FailJson("Download directory '$downloadPath' does not exist or cannot be accessed.")
 }
 
-$catalogCabTempPath = Join-Path -Path $catalogTempPath -ChildPath 'DriverPackCatalog.cab'
-$catalogXmlTempPath = Join-Path -Path $catalogTempPath -ChildPath 'DriverPackCatalog.xml'
-
-if (Test-Path $catalogCabTempPath)
-{
-    try {
-        Remove-Item -Path $catalogCabTempPath -Force | Out-Null
-    }
-    catch {
-        $module.FailJson("Failed to remove existing catalog CAB file '$catalogCabTempPath'. Error: $_")
-    }
-}
-
-if (Test-Path $catalogXmlTempPath)
-{
-    try {
-        Remove-Item -Path $catalogXmlTempPath -Force | Out-Null
-    }
-    catch {
-        $module.FailJson("Failed to remove existing catalog XML file '$catalogXmlTempPath'. Error: $_")
-    }
-}
-
-$webClient = New-Object System.Net.WebClient
-$webClient.DownloadFile($catalogUrl, $catalogCabTempPath)
-
-if (-not (Test-Path $catalogCabTempPath))
-{
-    $module.FailJson("Failed to download catalog CAB file from '$catalogUrl'.")
-}
-
-try
-{
-    Start-Process "C:\Windows\System32\expand.exe" -ArgumentList @("""$($catalogCabTempPath)""", """$($catalogXmlTempPath)""") -Wait
-}
-catch
-{
-    $module.FailJson("Failed to extract catalog CAB file '$catalogCabTempPath'. Error: $_")
-}
-
-try
-{
-    [XML]$catalogData = Get-Content -Path $catalogXmlTempPath
-}
-catch
-{
-    $module.FailJson("Failed to parse the catalog file '$catalogXmlTempPath'. Error: $_")
-}
+[XML]$catalogData = Get-Content -Path $catalogPath
 
 $catalogVersion = $catalogData.DriverPackManifest.version    
 $catalogBaseURL = "http://$($catalogData.DriverPackManifest.baseLocation)"
-[array]$driverPacks = $catalogData.DriverPackManifest.DriverPackage
+[Array]$driverPacks = $catalogData.DriverPackManifest.DriverPackage
 
 $isWinPE = $os -like 'winpe*'
 $dellOsCode = $osToDellOsCode[$os]
@@ -249,22 +190,10 @@ if ($createVersionSubdirectory)
 
 if (-not (Test-Path $downloadFinalPath))
 {
-    try
-    {
-        New-Item -Path $downloadFinalPath -ItemType Directory -Force | Out-Null
-    }
-    catch
-    {
-        $module.FailJson("Failed to create download directory '$downloadFinalPath'. Error: $_")
-    }
+    New-Item -Path $downloadFinalPath -ItemType Directory -Force | Out-Null
 }
 
 $downloadFilePath = Join-Path -Path $downloadFinalPath -ChildPath $driverPackFileName
-
-if ($driverPackFormat -eq 'exe')
-{
-    $downloadFilePath = $downloadFilePath -replace '\.exe$', '.zip'
-}
 
 $changed = $false
 $module.Result["catalog_version"] = $catalogVersion
@@ -292,6 +221,8 @@ if (-not $changed)
 
     $module.ExitJson()
 }
+
+$webClient = New-Object System.Net.WebClient
 
 $webClient.DownloadFile($driverPackURL, $downloadFilePath)
 

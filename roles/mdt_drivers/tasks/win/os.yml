@@ -1,0 +1,6 @@
+---
+- name: "Manage drivers by model | {{ _dell_mdt_operating_system.os }}"
+  loop: "{{ dell_mdt_models }}"
+  ansible.builtin.include_tasks: win/model.yml
+  loop_control:
+    loop_var: _dell_mdt_model

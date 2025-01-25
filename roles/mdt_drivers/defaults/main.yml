@@ -1,0 +1,5 @@
+---
+dell_mdt_catalog_download_url: https://downloads.dell.com/catalog/DriverPackCatalog.cab
+dell_mdt_max_retries: 3
+dell_mdt_update_mdt_boot_image: true
+dell_mdt_replace_wds_boot_image: false

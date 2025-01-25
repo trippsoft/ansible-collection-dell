@@ -1,0 +1,70 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+  cachier: machine
+  parallel: true
+platforms:
+  - name: dc
+    box: jtarpley/w2022_cis
+    memory: 2048
+    cpus: 2
+    provider_options:
+      default_prefix: wds_boot_image_
+    groups:
+      - windows
+      - windows_domain
+  - name: win
+    box: jtarpley/${MOLECULE_BOX:-w2022_cis}
+    memory: 2048
+    cpus: 2
+    provider_options:
+      default_prefix: wds_boot_image_
+    groups:
+      - subjects
+      - windows
+      - windows_domain
+      - windows_domain_members
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      subjects:
+        dell_mdt_share_path: C:\MDTShare
+        dell_mdt_winpe_driver_packs:
+          - os: winpe_11
+            mdt_path: WinPE11
+          - os: winpe_10
+            mdt_path: WinPE10
+        dell_mdt_operating_systems:
+          - os: win_11
+            base_mdt_path: Windows 11\Dell Inc.
+          - os: win_10
+            base_mdt_path: Windows 10\Dell Inc.
+        dell_mdt_models:
+          - catalog_name: Latitude 5550
+            mdt_name: Latitude 5550
+          - catalog_name: OptiPlex 7020 Micro
+            mdt_name: OptiPlex Micro 7020
+          - catalog_name: XPS 17 9710
+            mdt_name: XPS 17 9710
+        dell_mdt_replace_wds_boot_image: true
+        dell_mdt_wds_boot_image_name: MDT Boot Image
+        dell_mdt_wds_boot_image_description: MDT Boot Image
+        dell_mdt_wds_boot_image_display_order: 1
+      windows:
+        ansible_shell_type: powershell
+        ansible_become_method: runas
+        ansible_become_user: SYSTEM
+        ansible_password: vagrant
+    host_vars:
+      dc:
+        ansible_ssh_common_args: '-o PreferredAuthentications=password -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o ControlMaster=auto -o ControlPersist=60s -o ForwardX11=no -o LogLevel=ERROR -o StrictHostKeyChecking=no'
+      win:
+        ansible_user: TEST\vagrant
+        ansible_ssh_common_args: '-o PreferredAuthentications=password -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o ControlMaster=auto -o ControlPersist=60s -o ForwardX11=no -o LogLevel=ERROR -o StrictHostKeyChecking=no'
+verifier:
+  name: ansible

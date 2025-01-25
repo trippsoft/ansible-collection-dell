@@ -2,20 +2,39 @@
 - name: Prepare
   hosts:
     - subjects
+  roles:
+    - role: trippsc2.windows.install_psgallery
   tasks:
-    - name: Create download directories
+    - name: Install PSCX module
+      community.windows.win_psmodule:
+        name: Pscx
+        allow_clobber: true
+        state: present
+
+    - name: Create temporary directories
       loop:
         - C:\temp
         - C:\temp\winpe10
         - C:\temp\winpe11
         - C:\temp\win10
-        - C:\temp\win11
         - C:\temp\win10\OptiPlex 7020 Micro
         - C:\temp\win10\Latitude 5550
         - C:\temp\win10\XPS 13 9380
+        - C:\temp\win11
         - C:\temp\win11\OptiPlex 7020 Micro
         - C:\temp\win11\Latitude 5550
         - C:\temp\win11\XPS 13 9380
       ansible.windows.win_file:
         path: "{{ item }}"
         state: directory
+
+    - name: Download Dell driver catalog CAB
+      ansible.windows.win_get_url:
+        url: https://downloads.dell.com/catalog/DriverPackCatalog.cab
+        dest: C:\temp\DriverPackCatalog.cab
+
+    - name: Extract Dell driver catalog CAB
+      community.windows.win_unzip:
+        src: C:\temp\DriverPackCatalog.cab
+        dest: C:\temp
+        delete_archive: true

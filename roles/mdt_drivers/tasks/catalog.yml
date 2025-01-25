@@ -1,0 +1,19 @@
+---
+- name: Install PSCX module
+  community.windows.win_psmodule:
+    name: Pscx
+    allow_clobber: true
+    state: present
+
+- name: Download catalog CAB
+  ansible.windows.win_get_url:
+    url: "{{ dell_mdt_catalog_download_url }}"
+    dest: "{{ dell_mdt_temp_directory_path }}\\DriverPackCatalog.cab"
+  changed_when: false
+
+- name: Extract catalog CAB
+  community.windows.win_unzip:
+    src: "{{ dell_mdt_temp_directory_path }}\\DriverPackCatalog.cab"
+    dest: "{{ dell_mdt_temp_directory_path }}"
+    delete_archive: true
+  changed_when: false

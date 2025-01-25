@@ -1,0 +1,21 @@
+---
+- name: Validate
+  ansible.builtin.import_tasks: validate.yml
+
+- name: Download Dell driver catalog
+  ansible.builtin.import_tasks: catalog.yml
+
+- name: Download Dell WinPE driver packs
+  ansible.builtin.import_tasks: winpe/main.yml
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Import Dell drivers
+  ansible.builtin.import_tasks: win/main.yml
+
+- name: Delete Dell driver catalog
+  ansible.windows.win_file:
+    path: "{{ dell_mdt_temp_directory_path }}\\DriverPackCatalog.xml"
+    state: absent
+  changed_when: false

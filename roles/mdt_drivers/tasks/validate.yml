@@ -1,0 +1,86 @@
+---
+- name: Validate catalog download URL
+  ansible.builtin.assert:
+    that:
+      - dell_mdt_catalog_download_url is uri
+    fail_msg: The Dell MDT driver catalog download URL is not a valid URI.
+    success_msg: The Dell MDT driver catalog download URL is a valid URI.
+
+- name: Get temporary directory
+  when:
+    - dell_mdt_temp_directory_path is not defined
+  block:
+    - name: Get temporary directory
+      ansible.windows.win_tempfile:
+        state: directory
+      register: _dell_mdt_temp_directory
+      changed_when: false
+
+    - name: Set temporary directory path
+      ansible.builtin.set_fact:
+        dell_mdt_temp_directory_path: "{{ _dell_mdt_temp_directory.path }}"
+
+- name: Check temporary directory
+  ansible.windows.win_stat:
+    path: "{{ dell_mdt_temp_directory_path }}"
+  register: _dell_mdt_temp_directory
+
+- name: Validate temporary directory exists
+  when:
+    - dell_mdt_temp_directory_path is defined
+  ansible.builtin.assert:
+    that:
+      - _dell_mdt_temp_directory.stat.exists
+      - _dell_mdt_temp_directory.stat.isdir
+    fail_msg: The temporary directory does not exist.
+    success_msg: The temporary directory exists.
+
+- name: Validate MDT installation path
+  when:
+    - dell_mdt_installation_path is defined
+  block:
+    - name: Check for MDT PowerShell module
+      ansible.windows.win_stat:
+        path: "{{ dell_mdt_installation_path }}\\Bin\\MicrosoftDeploymentToolkit.psd1"
+      register: _dell_mdt_module_file
+
+    - name: Validate MDT PowerShell module exists
+      ansible.builtin.assert:
+        that:
+          - _dell_mdt_module_file.stat.exists
+        fail_msg: The MDT PowerShell module does not exist.
+        success_msg: The MDT PowerShell module exists.
+
+- name: Check for MDT deployment share
+  ansible.windows.win_stat:
+    path: "{{ dell_mdt_share_path }}"
+  register: _dell_mdt_share
+
+- name: Validate MDT deployment share exists
+  ansible.builtin.assert:
+    that:
+      - _dell_mdt_share.stat.exists
+      - _dell_mdt_share.stat.isdir
+    fail_msg: The MDT deployment share does not exist.
+    success_msg: The MDT deployment share exists.
+
+- name: Validate WDS variables
+  when:
+    - dell_mdt_update_mdt_boot_image 
+    - dell_mdt_replace_wds_boot_image
+  block:
+    - name: Validate WDS boot image name is defined
+      ansible.builtin.assert:
+        that:
+          - dell_mdt_wds_boot_image_name is defined
+        fail_msg: The WDS boot image name is not defined.
+        success_msg: The WDS boot image name is defined.
+
+    - name: Validate WDS boot image display order is positive integer
+      when:
+        - dell_mdt_wds_boot_image_display_order is defined
+      ansible.builtin.assert:
+        that:
+          - dell_mdt_wds_boot_image_display_order | int > 0
+        fail_msg: The WDS boot image display order is not a positive integer.
+        success_msg: The WDS boot image display order is a positive integer.

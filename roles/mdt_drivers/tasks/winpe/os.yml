@@ -1,0 +1,7 @@
+---
+- name: "Reset retry count | {{ _dell_mdt_winpe.os }}"
+  ansible.builtin.set_fact:
+    _dell_mdt_download_retry: 0
+
+- name: "Attempt to download Dell WinPE driver pack | {{ _dell_mdt_winpe.os }}"
+  ansible.builtin.include_tasks: winpe/attempt.yml

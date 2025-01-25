@@ -1,0 +1,7 @@
+---
+- name: "Reset retry count | {{ _dell_mdt_operating_system.os }} | {{ _dell_mdt_model.catalog_name }}" # noqa name[template]
+  ansible.builtin.set_fact:
+    _dell_mdt_download_retry: 0
+
+- name: "Attempt to download Dell driver pack | {{ _dell_mdt_operating_system.os }} | {{ _dell_mdt_model.catalog_name }} | Attempt {{ _dell_mdt_download_retry | int + 1 }}" # noqa name[template]
+  ansible.builtin.include_tasks: win/attempt.yml

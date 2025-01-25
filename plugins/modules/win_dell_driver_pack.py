@@ -18,23 +18,17 @@ attributes:
     details:
       - Does not support check mode
 options:
-  catalog_temp_path:
+  catalog_path:
     type: path
     required: true
     description:
-      - The temporary path to which to download the catalog file.
+      - The path to the Dell catalog XML file.
   download_path:
     type: path
     required: true
     description:
       - The path to which to download the driver pack.
       - If O(create_version_subdirectory=true), the driver pack will be extracted to a subdirectory named for the version.
-  catalog_url:
-    type: str
-    required: true
-    description:
-      - The URL of the Dell support site catalog file.
-      - Use this to specify a different catalog file mirror.
   os:
     type: str
     required: true
@@ -58,12 +52,6 @@ options:
     default: true
     description:
       - If V(true), the driver pack will be extracted to a subdirectory named for the version.
-  expand_cabs:
-    type: bool
-    required: false
-    default: false
-    description:
-      - If V(true), the CAB files in the driver pack will be extracted.
   disambiguation_method:
     type: str
     required: false
@@ -78,16 +66,16 @@ options:
 EXAMPLES = r"""
 - name: Download WinPE 10 Driver Pack
   trippsc2.dell.win_dell_driver_pack:
-    catalog_temp_path: C:\temp
-    download_path: C:\temp\winpe10
+    catalog_path: C:\\temp\\DriverPackCatalog.xml
+    download_path: C:\\temp\\winpe10
     os: winpe_10
     create_version_subdirectory: true
     expand_cabs: false
 
 - name: Download WinPE 11 Driver Pack
   trippsc2.dell.win_dell_driver_pack:
-    catalog_temp_path: C:\temp
-    download_path: C:\temp\winpe11
+    catalog_path: C:\\temp\\DriverPackCatalog.xml
+    download_path: C:\\temp\\winpe11
     os: winpe_11
     create_version_subdirectory: true
     expand_cabs: false
@@ -98,7 +86,7 @@ EXAMPLES = r"""
     - Latitude 5550
     - XPS 13 9380
   trippsc2.dell.win_dell_driver_pack:
-    catalog_temp_path: C:\temp
+    catalog_path: C:\\temp\\DriverPackCatalog.xml
     download_path: "C:\\temp\\win10\\{{ item }}"
     os: win_10
     model: "{{ item }}"
@@ -111,7 +99,7 @@ EXAMPLES = r"""
     - Latitude 5550
     - XPS 13 9380
   trippsc2.dell.win_dell_driver_pack:
-    catalog_temp_path: C:\temp
+    catalog_temp_path: C:\\temp
     download_path: "C:\\temp\\win11\\{{ item }}"
     os: win_11
     model: "{{ item }}"

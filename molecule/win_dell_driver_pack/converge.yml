@@ -5,14 +5,14 @@
   tasks:
     - name: Download WinPE 10 Driver Pack
       trippsc2.dell.win_dell_driver_pack:
-        catalog_temp_path: C:\temp
+        catalog_path: C:\temp\DriverPackCatalog.xml
         download_path: C:\temp\winpe10
         os: winpe_10
         create_version_subdirectory: true
 
     - name: Download WinPE 11 Driver Pack
       trippsc2.dell.win_dell_driver_pack:
-        catalog_temp_path: C:\temp
+        catalog_path: C:\temp\DriverPackCatalog.xml
         download_path: C:\temp\winpe11
         os: winpe_11
         create_version_subdirectory: true
@@ -23,7 +23,7 @@
         - Latitude 5550
         - XPS 13 9380
       trippsc2.dell.win_dell_driver_pack:
-        catalog_temp_path: C:\temp
+        catalog_path: C:\temp\DriverPackCatalog.xml
         download_path: "C:\\temp\\win10\\{{ item }}"
         os: win_10
         model: "{{ item }}"
@@ -35,7 +35,7 @@
         - Latitude 5550
         - XPS 13 9380
       trippsc2.dell.win_dell_driver_pack:
-        catalog_temp_path: C:\temp
+        catalog_path: C:\temp\DriverPackCatalog.xml
         download_path: "C:\\temp\\win11\\{{ item }}"
         os: win_11
         model: "{{ item }}"

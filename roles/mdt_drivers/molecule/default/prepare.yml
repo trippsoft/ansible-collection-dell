@@ -1,0 +1,77 @@
+---
+- name: Prepare DC
+  hosts:
+    - dc
+  roles:
+    - role: trippsc2.ad.testing_domain_controller
+
+- name: Prepare member server
+  hosts:
+    - windows_domain_members
+  gather_facts: false
+  roles:
+    - role: trippsc2.ad.testing_win_member
+
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        path: "{{ dell_mdt_share_path }}"
+        description: MDT Deployment Share
+        share_name: MDTShare
+        state: present
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: "{{ dell_mdt_share_path }}"
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Disable x86 in MDT
+      community.windows.win_lineinfile:
+        path: "{{ dell_mdt_share_path }}\\Control\\Settings.xml"
+        regex: '(^\s*<SupportX86>).*(<\/SupportX86>$)'
+        line: '  <SupportX86>False</SupportX86>'
+
+    - name: Change selection profile for x64 in MDT (speeds up boot image creation)
+      community.windows.win_lineinfile:
+        path: "{{ dell_mdt_share_path }}\\Control\\Settings.xml"
+        regex: '(^\s*<Boot\.x64\.SelectionProfile>).*(<\/Boot\.x64\.SelectionProfile>$)'
+        line: '  <Boot.x64.SelectionProfile>Nothing</Boot.x64.SelectionProfile>'
+
+    - name: Pre-create MDT directories to cleanup
+      loop:
+        - Out-of-Box Drivers\WinPE11\A00
+        - Out-of-Box Drivers\WinPE10\A00
+        - Out-of-Box Drivers\Windows 11\Dell Inc.\Latitude 5550\A00
+        - Out-of-Box Drivers\Windows 11\Dell Inc.\OptiPlex Micro 7020\A00
+        - Out-of-Box Drivers\Windows 11\Dell Inc.\XPS 17 9710\A00
+        - Out-of-Box Drivers\Windows 10\Dell Inc.\Latitude 5550\A00
+        - Out-of-Box Drivers\Windows 10\Dell Inc.\OptiPlex Micro 7020\A00
+        - Out-of-Box Drivers\Windows 10\Dell Inc.\XPS 17 9710\A00
+      trippsc2.mdt.directory:
+        path: "{{ item }}"
+        mdt_share_path: "{{ dell_mdt_share_path }}"
+        state: present
+
+    - name: Install Windows Deployment Services feature
+      ansible.windows.win_feature:
+        name:
+          - WDS
+        include_management_tools: true
+        state: present
+
+    - name: Initialize WDS
+      trippsc2.windows.wds_initialize:
+        remote_install_path: C:\RemoteInstall
+        state: initialized

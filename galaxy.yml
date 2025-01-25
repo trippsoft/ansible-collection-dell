@@ -1,7 +1,7 @@
 ---
 namespace: trippsc2
 name: dell
-version: 1.0.0
+version: 1.1.0
 readme: README.md
 authors:
   - Jim Tarpley
@@ -13,7 +13,11 @@ tags:
   - infrastructure
   - tools
 
-dependencies: {}
+dependencies:
+  ansible.windows: ">=1.0.0"
+  community.windows: ">=1.0.0"
+  trippsc2.mdt: ">=1.1.0"
+  trippsc2.windows: ">=1.1.0"
 
 repository: https://github.com/trippsc2/ansible-collection-dell.git
 

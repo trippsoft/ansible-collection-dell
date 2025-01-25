@@ -1,0 +1,6 @@
+---
+- name: Manage WinPE drivers by OS
+  loop: "{{ dell_mdt_winpe_driver_packs }}"
+  ansible.builtin.include_tasks: winpe/os.yml
+  loop_control:
+    loop_var: _dell_mdt_winpe

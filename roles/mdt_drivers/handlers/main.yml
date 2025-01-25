@@ -1,0 +1,22 @@
+---
+- name: Update MDT boot image
+  listen: _dell_mdt_rebuild_boot_image
+  when:
+    - dell_mdt_update_mdt_boot_image
+  trippsc2.mdt.boot_image:
+    compress: true
+    mdt_share_path: "{{ dell_mdt_share_path }}"
+  register: _dell_mdt_boot_image
+  notify:
+    - _dell_mdt_replace_wds_boot_image
+
+- name: Replace WDS boot image
+  listen: _dell_mdt_replace_wds_boot_image
+  when:
+    - dell_mdt_replace_wds_boot_image
+  trippsc2.windows.wds_boot_image:
+    image_name: "{{ dell_mdt_wds_boot_image_name }}"
+    path: "{{ _dell_mdt_boot_image.litetouch_wim.path }}"
+    description: "{{ dell_mdt_wds_boot_image_description | default(omit) }}"
+    architecture: x64
+    display_order: "{{ dell_mdt_wds_boot_image_display_order | default(omit) }}"
