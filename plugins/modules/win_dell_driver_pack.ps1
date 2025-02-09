@@ -5,7 +5,7 @@
 $spec = @{
     options = @{
         catalog_path = @{
-            type = 'str'
+            type = 'path'
             required = $true
         }
         download_path = @{
@@ -49,12 +49,12 @@ $spec = @{
 }
 
 $osToDellOsCode = @{
-    winpe_11='winpe11x'
-    winpe_10='winpe10x'
-    win_11='Windows11'
-    win_10='Windows10'
+    winpe_11 = 'winpe11x'
+    winpe_10 = 'winpe10x'
+    win_11 = 'Windows11'
+    win_10 = 'Windows10'
 }
-  
+
 $module = [Ansible.Basic.AnsibleModule]::Create($args, $spec)
 
 $catalogPath = $module.Params['catalog_path']
@@ -65,19 +65,17 @@ $disambiguationMethod = $module.Params['disambiguation_method']
 
 $downloadPath = $downloadPath.TrimEnd("\")
 
-if (-not (Test-Path $catalogPath -PathType Leaf))
-{
+if (-not (Test-Path -LiteralPath $catalogPath -PathType Leaf)) {
     $module.FailJson("Catalog XML file '$catalogPath' does not exist or cannot be accessed.")
 }
 
-if (-not (Test-Path $downloadPath))
-{
+if (-not (Test-Path -LiteralPath $downloadPath -PathType Container)) {
     $module.FailJson("Download directory '$downloadPath' does not exist or cannot be accessed.")
 }
 
-[XML]$catalogData = Get-Content -Path $catalogPath
+[XML]$catalogData = Get-Content -LiteralPath $catalogPath
 
-$catalogVersion = $catalogData.DriverPackManifest.version    
+$catalogVersion = $catalogData.DriverPackManifest.version
 $catalogBaseURL = "http://$($catalogData.DriverPackManifest.baseLocation)"
 [Array]$driverPacks = $catalogData.DriverPackManifest.DriverPackage
 
@@ -86,12 +84,9 @@ $dellOsCode = $osToDellOsCode[$os]
 
 $matchingDriverPacks = New-Object System.Collections.Generic.List[System.Xml.XmlElement]
 
-foreach ($driverPack in $driverPacks)
-{
-    if (-not $isWinPE)
-    {
-        if (-not $driverPack.SupportedSystems)
-        {
+foreach ($driverPack in $driverPacks) {
+    if (-not $isWinPE) {
+        if (-not $driverPack.SupportedSystems) {
             continue
         }
 
@@ -99,80 +94,65 @@ foreach ($driverPack in $driverPacks)
 
         $isSystemSupported = $false
 
-        foreach ($supportedSystem in $supportedSystems)
-        {
-            if ($supportedSystem.Brand.Model.name -ieq $module.Params['model'])
-            {
+        foreach ($supportedSystem in $supportedSystems) {
+            if ($supportedSystem.Brand.Model.name -ieq $module.Params['model']) {
                 $isSystemSupported = $true
                 break
             }
         }
 
-        if (-not $isSystemSupported)
-        {
+        if (-not $isSystemSupported) {
             continue
         }
     }
 
-    if (-not $driverPack.SupportedOperatingSystems)
-    {
+    if (-not $driverPack.SupportedOperatingSystems) {
         continue
     }
 
     $supportedOSes = [Array]$driverPack.SupportedOperatingSystems
 
-    foreach ($supportedOS in $supportedOSes)
-    {
-        if ($supportedOS.OperatingSystem.osCode -eq $dellOsCode -and $supportedOS.OperatingSystem.osArch -eq 'x64')
-        {
-            $matchingDriverPacks.Add($driverPack)
+    foreach ($supportedOS in $supportedOSes) {
+        if ($supportedOS.OperatingSystem.osCode -eq $dellOsCode -and $supportedOS.OperatingSystem.osArch -eq 'x64') {
+            $matchingDriverPacks.Add($driverPack) | Out-Null
             break
         }
     }
 }
 
-if ($matchingDriverPacks.Count -eq 0)
-{
-    if ($isWinPE)
-    {
+if ($matchingDriverPacks.Count -eq 0) {
+    if ($isWinPE) {
         $module.FailJson("No driver packs found for the specified OS '$os'.")
     }
 
     $module.FailJson("No driver packs found for the specified OS '$os' and model '$($module.Params['model'])'.")
 }
 
-if ($matchingDriverPacks.Count -gt 1)
-{
-    if ($disambiguationMethod -eq 'newest')
-    {
+if ($matchingDriverPacks.Count -gt 1) {
+    if ($disambiguationMethod -eq 'newest') {
         $selectedDateTime = [System.DateTime]::MinValue
     }
-    else
-    {
+    else {
         $selectedDateTime = [System.DateTime]::MaxValue
     }
 
     $driverPack = $matchingDriverPacks[0]
 
-    foreach ($matchingDriverPack in $matchingDriverPacks)
-    {
+    foreach ($matchingDriverPack in $matchingDriverPacks) {
         $driverPackDateTime = [System.DateTime]::Parse($matchingDriverPack.dateTime)
 
-        if ($driverPackDateTime -gt $selectedDateTime -and $disambiguationMethod -eq 'newest')
-        {
+        if ($driverPackDateTime -gt $selectedDateTime -and $disambiguationMethod -eq 'newest') {
             $selectedDateTime = $driverPackDateTime
             $driverPack = $matchingDriverPack
         }
 
-        if ($driverPackDateTime -lt $selectedDateTime -and $disambiguationMethod -eq 'oldest')
-        {
+        if ($driverPackDateTime -lt $selectedDateTime -and $disambiguationMethod -eq 'oldest') {
             $selectedDateTime = $driverPackDateTime
             $driverPack = $matchingDriverPack
         }
     }
 }
-else
-{
+else {
     $driverPack = $matchingDriverPacks[0]
 }
 
@@ -183,13 +163,11 @@ $driverPackFormat = $driverPack.format
 
 $downloadFinalPath = $downloadPath
 
-if ($createVersionSubdirectory)
-{
+if ($createVersionSubdirectory) {
     $downloadFinalPath = Join-Path -Path $downloadPath -ChildPath $driverPackVersion
 }
 
-if (-not (Test-Path $downloadFinalPath))
-{
+if (-not (Test-Path -LiteralPath $downloadFinalPath)) {
     New-Item -Path $downloadFinalPath -ItemType Directory -Force | Out-Null
 }
 
@@ -201,22 +179,18 @@ $module.Result["driver_pack_version"] = $driverPackVersion
 $module.Result["driver_pack_path"] = $downloadFilePath
 $module.Result["driver_format"] = $driverPackFormat
 
-if (-not (Test-Path $downloadFilePath))
-{
+if (-not (Test-Path -LiteralPath $downloadFilePath)) {
     $changed = $true
 }
-else
-{
-    $existingFileHash = Get-FileHash -Path $downloadFilePath -Algorithm MD5
+else {
+    $existingFileHash = Get-FileHash -LiteralPath $downloadFilePath -Algorithm MD5
 
-    if ($existingFileHash.Hash -ine $driverPack.hashMD5)
-    {
+    if ($existingFileHash.Hash -ine $driverPack.hashMD5) {
         $changed = $true
     }
 }
 
-if (-not $changed)
-{
+if (-not $changed) {
     $module.Result["changed"] = $false
 
     $module.ExitJson()
