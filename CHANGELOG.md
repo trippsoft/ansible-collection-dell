@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2025-02-09
+
+### win_dell_driver_pack Module Plugin
+
+- Made several code quality and style changes to the module that were recommended by the Ansible sanity tests.
+
 ## [1.1.0] - 2025-01-25
 
 ### Collection
