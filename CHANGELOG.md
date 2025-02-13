@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] - 2025-02-13
+
+### win_dell_driver_pack Module Plugin
+
+- Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
+
 ## [1.1.1] - 2025-02-09
 
 ### win_dell_driver_pack Module Plugin
