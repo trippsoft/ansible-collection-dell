@@ -25,10 +25,17 @@
 
     - name: Create MDT Deployment Share
       trippsc2.mdt.deployment_share:
-        path: "{{ dell_mdt_share_path }}"
+        mdt_share_path: "{{ dell_mdt_share_path }}"
         description: MDT Deployment Share
-        share_name: MDTShare
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
         state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: "{{ dell_mdt_share_path }}"
+        full: Everyone
+        caching_mode: None
 
     - name: Add permissions to MDT Deployment Share
       ansible.windows.win_acl:
@@ -37,17 +44,13 @@
         rights: FullControl
         type: allow
 
-    - name: Disable x86 in MDT
-      community.windows.win_lineinfile:
-        path: "{{ dell_mdt_share_path }}\\Control\\Settings.xml"
-        regex: '(^\s*<SupportX86>).*(<\/SupportX86>$)'
-        line: '  <SupportX86>False</SupportX86>'
-
-    - name: Change selection profile for x64 in MDT (speeds up boot image creation)
-      community.windows.win_lineinfile:
-        path: "{{ dell_mdt_share_path }}\\Control\\Settings.xml"
-        regex: '(^\s*<Boot\.x64\.SelectionProfile>).*(<\/Boot\.x64\.SelectionProfile>$)'
-        line: '  <Boot.x64.SelectionProfile>Nothing</Boot.x64.SelectionProfile>'
+    - name: Configure MDT Deployment Share settings
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: "{{ dell_mdt_share_path }}"
+        x86:
+          enabled: false
+        x64:
+          selection_profile: Nothing
 
     - name: Pre-create MDT directories to cleanup
       loop:
