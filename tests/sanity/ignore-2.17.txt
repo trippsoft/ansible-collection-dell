@@ -1,0 +1,3 @@
+plugins/modules/win_dell_driver_pack.ps1 pslint:PSAvoidUsingBrokenHashAlgorithms
+plugins/modules/win_dell_driver_pack.ps1 validate-modules:missing-gplv3-license
+plugins/modules/win_dell_driver_pack.py validate-modules:missing-gplv3-license
