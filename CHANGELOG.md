@@ -4,13 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [1.1.2] - 2025-02-13
 
-### win_dell_driver_pack Module Plugin
+### Module Plugin - win_dell_driver_pack
 
 - Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
 
 ## [1.1.1] - 2025-02-09
 
-### win_dell_driver_pack Module Plugin
+### Module Plugin - win_dell_driver_pack
 
 - Made several code quality and style changes to the module that were recommended by the Ansible sanity tests.
 
@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file.
 
 - *mdt_drivers* role added.
 
-### win_dell_driver_pack Module Plugin
+### Module Plugin - win_dell_driver_pack
 
 - Removed steps to download and extract catalog CAB file. This was done to simplify the module.
 - Removed steps to extract the CAB and EXE file. This was done to simplify the module.
