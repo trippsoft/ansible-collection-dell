@@ -13,7 +13,7 @@ platforms:
     memory: 2048
     cpus: 2
     provider_options:
-      default_prefix: win_dell_driver_pack_
+      default_prefix: dell_win_dell_driver_pack_
     groups:
       - subjects
       - windows
