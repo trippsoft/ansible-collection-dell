@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.3] - 2025-06-10
+
+### Collection
+
+- Changed repository URL to use GitHub Organization.
+
 ## [1.1.2] - 2025-02-13
 
 ### Module Plugin - win_dell_driver_pack

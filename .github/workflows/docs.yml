@@ -1,0 +1,21 @@
+---
+name: Generate Role Docs
+'on':
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+    paths:
+      - galaxy.yml
+defaults:
+  run:
+    working-directory: 'trippsc2.dell'
+jobs:
+  docs_mdt_drivers:
+    name: Generate mdt_drivers role documentation
+    permissions:
+      contents: write
+    uses: trippsoft/github-actions/.github/workflows/role-docs.yml@main
+    with:
+      working_directory: 'trippsc2.dell'
+      role_name: 'mdt_drivers'
