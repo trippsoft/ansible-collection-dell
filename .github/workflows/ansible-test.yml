@@ -23,10 +23,10 @@ defaults:
 jobs:
   sanity:
     name: Run ansible-test
-    runs-on:
-      - self-hosted
-      - linux
-      - x64
+    uses: trippsoft/github-actions/.github/workflows/ansible-test.yml@main
+    with:
+      working_directory: 'collections/ansible_collections/trippsc2/dell'
+      ansible_version: ${{ matrix.ansible_version }}
     strategy:
       fail-fast: false
       matrix:
@@ -34,13 +34,3 @@ jobs:
           - '2.18'
           - '2.17'
           - '2.16'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: 'collections/ansible_collections/trippsc2/dell'
-      - name: Run Molecule tests
-        run: |
-          source ~/venv/ansible-test-${{ matrix.ansible_version }}/bin/activate
-          ansible-test sanity -v --docker
-          deactivate
