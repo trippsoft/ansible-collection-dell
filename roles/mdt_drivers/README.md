@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.dell.mdt_drivers
-Version: 1.1.2
+Version: 1.1.3
 
 This role manages Dell MDT drivers.
 
@@ -63,5 +63,5 @@ This role manages Dell MDT drivers.
 MIT
 
 ## Author and Project Information
-Jim Tarpley
+Jim Tarpley (@trippsc2)
 <!-- END_ANSIBLE_DOCS -->
