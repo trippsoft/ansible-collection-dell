@@ -1,5 +1,5 @@
 ---
-name: Molecule - domain_controller role
+name: ansible-test
 'on':
   workflow_call: {}
   workflow_dispatch: {}
