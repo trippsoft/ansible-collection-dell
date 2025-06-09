@@ -22,7 +22,7 @@ defaults:
     working-directory: 'collections/ansible_collections/trippsc2/dell'
 jobs:
   sanity:
-    name: Run Molecule tests - existing domain
+    name: Run ansible-test
     runs-on:
       - self-hosted
       - linux
