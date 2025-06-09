@@ -63,9 +63,9 @@
       register: _dell_mdt_versions
 
     - name: "Cleanup old driver packs | {{ _dell_mdt_operating_system.os }} | {{ _dell_mdt_model.catalog_name }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
-      loop: "{{ _dell_mdt_versions.info.children }}"
+      loop: "{{ _dell_mdt_versions.directory.contents }}"
       when:
-        - item.node_type == 'DriverFolder'
+        - item.type == 'driver_folder'
         - _dell_mdt_download.driver_pack_version != item.name
       trippsc2.mdt.directory:
         path: "{{ _dell_mdt_base_path }}\\{{ item.name }}"
