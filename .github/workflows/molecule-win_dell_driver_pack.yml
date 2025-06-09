@@ -1,5 +1,5 @@
 ---
-name: Molecule - domain_controller role
+name: Molecule - win_dell_driver_pack module plugin
 'on':
   workflow_call: {}
   workflow_dispatch: {}
@@ -20,7 +20,7 @@ defaults:
     working-directory: 'trippsc2.dell'
 jobs:
   molecule:
-    name: Run Molecule tests - existing domain
+    name: Run Molecule tests
     runs-on:
       - self-hosted
       - linux
