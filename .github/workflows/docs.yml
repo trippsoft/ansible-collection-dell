@@ -7,6 +7,10 @@ name: Generate Role Docs
       - main
     paths:
       - galaxy.yml
+      - roles/mdt_drivers/.aar_doc.yml
+      - roles/mdt_drivers/README.md
+      - roles/mdt_drivers/meta/argument_specs.yml
+      - roles/mdt_drivers/meta/main.yml
 defaults:
   run:
     working-directory: 'trippsc2.dell'
