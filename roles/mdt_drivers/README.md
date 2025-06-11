@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.dell.mdt_drivers
-Version: 1.1.3
+Version: 1.1.4
 
 This role manages Dell MDT drivers.
 
@@ -9,7 +9,7 @@ This role manages Dell MDT drivers.
 
 | Platform | Versions |
 | -------- | -------- |
-| Windows | <ul><li>2019</li><li>2022</li></ul> |
+| Windows | <ul><li>2025</li><li>2022</li><li>2019</li></ul> |
 
 ## Dependencies
 | Role |
