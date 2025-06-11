@@ -8,15 +8,17 @@ name: ansible-test
       - main
     paths:
       - galaxy.yml
-      - plugins/modules/win_dell_driver_pack.ps1
-      - plugins/modules/win_dell_driver_pack.py
+      - plugins/modules/*.ps1
+      - plugins/modules/*.py
+      - plugins/modules/*.yml
   push:
     branches:
       - main
     paths:
       - galaxy.yml
-      - plugins/modules/win_dell_driver_pack.ps1
-      - plugins/modules/win_dell_driver_pack.py
+      - plugins/modules/*.ps1
+      - plugins/modules/*.py
+      - plugins/modules/*.yml
 defaults:
   run:
     working-directory: 'collections/ansible_collections/trippsc2/dell'
