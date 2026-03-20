@@ -66,7 +66,7 @@
 
 - name: Validate WDS variables
   when:
-    - dell_mdt_update_mdt_boot_image 
+    - dell_mdt_update_mdt_boot_image
     - dell_mdt_replace_wds_boot_image
   block:
     - name: Validate WDS boot image name is defined

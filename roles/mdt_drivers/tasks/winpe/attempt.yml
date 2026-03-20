@@ -1,21 +1,24 @@
 ---
-- name: "Attempt to download Dell WinPE driver pack | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry | int + 1 }}" # noqa name[template]
+- name: >-
+    Attempt to download Dell WinPE driver pack |
+    {{ _dell_mdt_winpe.os }} |
+    Attempt {{ _dell_mdt_download_retry | int + 1 }}
   block:
-    - name: "Increment retry counter | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry | int + 1 }}" # noqa name[template]
+    - name: "Increment retry counter | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry | int + 1 }}"
       ansible.builtin.set_fact:
         _dell_mdt_download_retry: "{{ _dell_mdt_download_retry | int + 1 }}"
 
-    - name: "Set download path variable | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: "Set download path variable | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}"
       ansible.builtin.set_fact:
         _dell_mdt_download_path: "{{ dell_mdt_temp_directory_path }}\\{{ _dell_mdt_winpe.os }}"
 
-    - name: "Create temporary directories | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: "Create temporary directories | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}"
       ansible.windows.win_file:
         path: "{{ _dell_mdt_download_path }}"
         state: directory
       changed_when: false
 
-    - name: "Download Dell WinPE driver pack | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: "Download Dell WinPE driver pack | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}"
       trippsc2.dell.win_dell_driver_pack:
         catalog_path: "{{ dell_mdt_temp_directory_path }}\\DriverPackCatalog.xml"
         download_path: "{{ _dell_mdt_download_path }}"
@@ -24,22 +27,22 @@
       register: _dell_mdt_download
       changed_when: false
 
-    - name: "Set MDT base path variable | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: "Set MDT base path variable | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}"
       ansible.builtin.set_fact:
         _dell_mdt_base_path: "Out-of-Box Drivers\\{{ _dell_mdt_winpe.mdt_path }}"
 
-    - name: "Set MDT version path variable | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: "Set MDT version path variable | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}"
       ansible.builtin.set_fact:
         _dell_mdt_version_path: >-
           {{ _dell_mdt_base_path }}\{{ _dell_mdt_download.driver_pack_version }}
 
-    - name: "Create version subdirectory | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: "Create version subdirectory | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}"
       trippsc2.mdt.directory:
         path: "{{ _dell_mdt_version_path }}"
         mdt_share_path: "{{ dell_mdt_share_path }}"
         state: present
 
-    - name: "Import Dell WinPE driver pack | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: "Import Dell WinPE driver pack | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}"
       trippsc2.mdt.import_drivers:
         source_paths:
           - "{{ _dell_mdt_download_path }}"
@@ -48,7 +51,10 @@
       notify:
         - _dell_mdt_rebuild_boot_image
 
-    - name: "Get existing Dell WinPE driver pack directories | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: >-
+        Get existing Dell WinPE driver pack directories |
+        {{ _dell_mdt_winpe.os }} |
+        Attempt {{ _dell_mdt_download_retry }}
       trippsc2.mdt.directory_info:
         path: "{{ _dell_mdt_base_path }}"
         mdt_share_path: "{{ dell_mdt_share_path }}"
@@ -66,26 +72,32 @@
       loop_control:
         label: "{{ item.name }}"
 
-    - name: "Cleanup downloaded WinPE driver pack directory | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: >-
+        Cleanup downloaded WinPE driver pack directory |
+        {{ _dell_mdt_winpe.os }} |
+        Attempt {{ _dell_mdt_download_retry }}
       ansible.windows.win_file:
         path: "{{ _dell_mdt_download_path }}"
         state: absent
       changed_when: false
   rescue:
-    - name: "Delete temporary directory | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: "Delete temporary directory | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}"
       ansible.windows.win_file:
         path: "{{ _dell_mdt_download_path }}"
         state: absent
       changed_when: false
 
-    - name: "Fail if download retries exceed limit | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}" # noqa name[template]
+    - name: "Fail if download retries exceed limit | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry }}"
       when: _dell_mdt_download_retry | int > 3
       ansible.builtin.fail:
         msg: "Failed to download Dell WinPE driver pack after {{ _dell_mdt_download_retry }} retries."
 
-    - name: "Wait before retrying download | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry | int + 1 }}" # noqa name[template]
+    - name: >-
+        Wait before retrying download |
+        {{ _dell_mdt_winpe.os }} |
+        Attempt {{ _dell_mdt_download_retry | int + 1 }}
       ansible.builtin.pause:
         seconds: "{{ _dell_mdt_download_retry | int * 30 }}"
 
-    - name: "Retry download | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry | int + 1 }}" # noqa name[template]
+    - name: "Retry download | {{ _dell_mdt_winpe.os }} | Attempt {{ _dell_mdt_download_retry | int + 1 }}"
       ansible.builtin.include_tasks: winpe/attempt.yml
