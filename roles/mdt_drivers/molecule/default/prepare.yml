@@ -42,7 +42,7 @@
     - name: Add permissions to MDT Deployment Share
       ansible.windows.win_acl:
         path: "{{ dell_mdt_share_path }}"
-        user: vagrant
+        user: TEST\vagrant
         rights: FullControl
         type: allow
 
