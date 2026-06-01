@@ -28,12 +28,12 @@ defaults:
     working-directory: 'trippsc2.dell'
 jobs:
   molecule:
-    name: Run Molecule tests
-    uses: trippsoft/github-actions/.github/workflows/molecule.yml@main
-    with:
-      working_directory: 'trippsc2.dell'
-      role_name: 'mdt_drivers'
-      box: ${{ matrix.box }}
+    name: Run Molecule tests - mdt_drivers
+    runs-on:
+      - self-hosted
+      - linux
+      - ansible
+      - x64
     strategy:
       fail-fast: false
       matrix:
@@ -41,3 +41,21 @@ jobs:
           - w2025_cis
           - w2022_cis
           - w2019_cis
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          path: trippsc2.dell
+      - name: Run Molecule tests
+        working-directory: 'trippsc2.dell'
+        run: |
+          source ~/venv/ansible-2.16/bin/activate
+          rm -rf ~/.ansible/collections/ansible_collections/*
+          cd ./roles/mdt_drivers
+          molecule test
+          rm -rf ~/.ansible/collections/ansible_collections/*
+          deactivate
+        env:
+          ANSIBLE_FORCE_COLOR: '1'
+          PY_COLORS: '1'
+          MOLECULE_BOX: ${{ matrix.box }}
