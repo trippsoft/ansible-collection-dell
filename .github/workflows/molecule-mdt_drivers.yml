@@ -28,7 +28,7 @@ defaults:
     working-directory: 'trippsc2.dell'
 jobs:
   molecule:
-    name: Run Molecule tests - mdt_drivers
+    name: Run Molecule tests
     runs-on:
       - self-hosted
       - linux
